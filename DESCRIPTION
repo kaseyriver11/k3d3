@@ -1,0 +1,14 @@
+Package: k3d3
+Type: Package
+Title: Create D3 visualizations (tree layouts and hierarchical edge bundling)
+Version: 0.1.1
+Authors@R: person("Kasey", "Jones", email = "kaseyriver11@gmail.com", role = c("aut", "cre"))
+Description: This package creates simple D3 visualizations. It was created so users could use R to manipulate data, and then immediately create a D3 visualization.
+License: GPL (>= 3.0.0)
+Depends: R (>= 3.1.3)
+Imports:
+	htmlwidgets(>= 0.3.2)
+Suggests:
+    htmltools (>= 0.2.6),
+    RCurl
+LazyData: true
