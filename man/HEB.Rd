@@ -31,13 +31,13 @@ Create a HEB D3 Visualization
 \examples{
 \dontrun{
 # Create the Data Frame
-library(datasets)
-library(RJSONIO)
-df <- data.frame(name = cardata$X, cylinders = cardata$cylinders)
+library(datasets) # We need the data
+library(RJSONIO)  # To convert data to JSON
+df <- data.frame(name = rownames(mtcars), cylinders = mtcars$cyl)
 # Make the json
-cylindercount <- as.character(unique(df$cylinders))
-cyl <- lapply(1:length(cylindercount), function(y){
-list(name=paste0("data.cylinder.", cylindercount[y], sep = ""),
+cyltype <- as.character(unique(df$cylinders))
+cyl <- lapply(1:length(cyltype), function(y){
+list(name=paste0("data.cylinder.", cyltype[y], sep = ""),
 size = 3938,imports = c("",""))})
 cyl <- toJSON(cyl) #change it for the json, removing [
 cyl <- substr(cyl,1,nchar(cyl)-1);
