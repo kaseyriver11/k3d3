@@ -4,6 +4,12 @@ HTMLWidgets.widget({
   type: "output",
   
   renderValue: function(d, x) {
+	  
+	  // Remove the previous svg element 
+	//var svg = d3.select(d).select("svg");
+	//	svg.selectAll("*").remove(); 
+	d3.select("svg").remove();
+	
 	var width = x.options.width,
 		height = x.options.height;
 	
@@ -21,7 +27,6 @@ HTMLWidgets.widget({
 	var formatComma = d3.format(",");
 
 	var mousemove = x.options.mousemove;
-	
 	
 	
 	var mouseout = function() {
@@ -45,7 +50,7 @@ HTMLWidgets.widget({
 		  .style("fill", function(d) { return d.children ? color(d.name) : color(d.name); })
 		  .on("mousemove",  mousemove)
 		  .on("mouseout", mouseout);
-
+		  
 	  svg.selectAll(".label")
 		  .data(nodes.filter(function(d) { return d.dx > 6; }))
 		.enter().append("text")
@@ -57,7 +62,6 @@ HTMLWidgets.widget({
 		  .text(function(d) { return d.dx > 10 ? d.name: null; })
 		  .on("mousemove",  mousemove)
 		  .on("mouseout", mouseout);
-	  
   }
 });
 
