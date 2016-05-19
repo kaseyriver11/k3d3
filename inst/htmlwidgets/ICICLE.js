@@ -42,7 +42,7 @@ HTMLWidgets.widget({
 	  svg.selectAll(".node")
 		  .data(nodes)
 		.enter().append("rect")
-		  .attr("class", "node")
+		  .attr("class", "node2")
 		  .attr("x", function(d) { return d.x; })
 		  .attr("y", function(d) { return d.y; })
 		  .attr("width", function(d) { return d.dx; })
@@ -57,9 +57,10 @@ HTMLWidgets.widget({
 		  .attr("class", "label")
 		  .attr("dy", ".35em")
 		  .attr("transform", function(d) { return "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; })
-		  .attr("transform", function(d) { return d.dx < 40 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
+		  .attr("transform", function(d) { return d.dx < 50 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
 															  "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; }) 
-		  .text(function(d) { return d.dx > 10 ? d.name: null; })
+		  .text(function(d) { 	if(10 < d.dx & d.dx < 50 & d.name.length > 12) return d.name.substring(0,12)+'...';
+								else return d.dx > 10 ? d.name: null; })
 		  .on("mousemove",  mousemove)
 		  .on("mouseout", mouseout);
   }
