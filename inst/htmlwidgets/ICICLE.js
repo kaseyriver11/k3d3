@@ -57,10 +57,10 @@ HTMLWidgets.widget({
 		  .attr("class", "label")
 		  .attr("dy", ".35em")
 		  .attr("transform", function(d) { return "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; })
-		  .attr("transform", function(d) { return d.dx < 50 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
+		  .attr("transform", function(d) { return d.dx < 120 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
 															  "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; }) 
-		  .text(function(d) { 	if(10 < d.dx & d.dx < 50 & d.name.length > 12) return d.name.substring(0,12)+'...';
-								else return d.dx > 10 ? d.name: null; })
+		  .text(function(d) { 	if(15 < d.dx & d.dx < 120 & d.name.length > 12) return d.name.substring(0,12)+'...';
+								else return d.dx > 119 ? d.name: null; })
 		  .on("mousemove",  mousemove)
 		  .on("mouseout", mouseout);
   }
