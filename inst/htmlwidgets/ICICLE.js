@@ -15,6 +15,7 @@ HTMLWidgets.widget({
 	
 	var color = x.options.color;
 	
+	var textcolor = x.options.color2;
 
 	var svg = d3.select(d).append("svg")
 		.attr("width", width)
@@ -27,11 +28,14 @@ HTMLWidgets.widget({
 	var formatComma = d3.format(",");
 
 	var mousemove = x.options.mousemove;
-	
-	
+		
 	var mouseout = function() {
 	  d3.select("#tooltip").classed("hidden", true);
 	};
+	
+	var onclick = function(d) {
+	 Shiny.onInputChange("myclick", d.name);	
+	}
 
 	var myjson = x.data;
 	
@@ -49,7 +53,8 @@ HTMLWidgets.widget({
 		  .attr("height", function(d) { return d.dy; })
 		  .style("fill", function(d) { return d.children ? color(d.name) : color(d.name); })
 		  .on("mousemove",  mousemove)
-		  .on("mouseout", mouseout);
+		  .on("click", onclick);
+		 /* .on("mouseout", mouseout); */
 		  
 	  svg.selectAll(".label")
 		  .data(nodes.filter(function(d) { return d.dx > 6; }))
@@ -57,12 +62,13 @@ HTMLWidgets.widget({
 		  .attr("class", "label")
 		  .attr("dy", ".35em")
 		  .attr("transform", function(d) { return "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; })
-		  .attr("transform", function(d) { return d.dx < 120 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
+		  .attr("transform", function(d) { return d.dx < 125 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
 															  "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; }) 
-		  .text(function(d) { 	if(15 < d.dx & d.dx < 120 & d.name.length > 12) return d.name.substring(0,12)+'...';
-								else return d.dx > 119 ? d.name: null; })
+		  .text(function(d) { if(10 < d.dx & d.dx < 130) return d.name; /* d.name.substring(0,8)+'...' */ 
+							  else return d.dx > 129 ? d.name: null; }) 
 		  .on("mousemove",  mousemove)
-		  .on("mouseout", mouseout);
+		  .on("click", onclick);
+		/*  .on("mouseout", mouseout); */
   }
 });
 

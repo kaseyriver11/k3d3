@@ -48,13 +48,15 @@ ICICLE <- function(data,
                    width = 960,
                    height = 500,
                    color =  "d3.scale.category20()",
+                   textcolor = "#000000",
                    mousemove = NULL) 
 {
-    # create options
+    # create options .
     options = list(
         width = width,
         height = height,
         color = JS(color),
+        textcolor = textcolor,
         mousemove = JS(mousemove)
     )
     # create widget
