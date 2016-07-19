@@ -62,7 +62,7 @@ HTMLWidgets.widget({
 		  .attr("class", "label")
 		  .attr("dy", ".35em")
 		  .style("fill", textcolor)
-		  .style("font-size",function(d) { return d.dx > 125 ? "24px": "12px";})
+		  .style("font-size",function(d) { return d.dx > 165 ? "14px": "12px";})
 		  .attr("transform", function(d) { return "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; })
 		  .attr("transform", function(d) { return d.dx < 125 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
 															  "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; }) 

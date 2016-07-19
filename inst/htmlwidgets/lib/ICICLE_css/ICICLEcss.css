@@ -9,15 +9,14 @@
 }
 
 #tooltip {
-  position: absolute;
+  position: relative;
+  margin: auto;
   width: auto;
   height: auto;
   padding: 10px;
   background-color: white;
   border-radius: 13px;
   pointer-events: none;
-  top: 15px;
-  left: 15px;
 }
 #tooltip.hidden {
   display: none;
