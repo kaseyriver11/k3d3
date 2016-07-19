@@ -2,6 +2,9 @@
   fill: #ddd;
   stroke: #fff;
 }
+.node2:hover{
+	opacity: .5;
+}
 
 .label {
   font: 14px sans-serif;
