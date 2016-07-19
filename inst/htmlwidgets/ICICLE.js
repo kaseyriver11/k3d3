@@ -15,7 +15,7 @@ HTMLWidgets.widget({
 	
 	var color = x.options.color;
 	
-	var textcolor = x.options.color2;
+	var textcolor = x.options.textcolor;
 
 	var svg = d3.select(d).append("svg")
 		.attr("width", width)
@@ -61,6 +61,8 @@ HTMLWidgets.widget({
 		.enter().append("text")
 		  .attr("class", "label")
 		  .attr("dy", ".35em")
+		  .style("fill", textcolor)
+		  .style("font-size",function(d) { return d.dx > 125 ? "24px": "12px";})
 		  .attr("transform", function(d) { return "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; })
 		  .attr("transform", function(d) { return d.dx < 125 ? "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")rotate(90)": 
 															  "translate(" + (d.x + d.dx / 2) + "," + (d.y + d.dy / 2) + ")"; }) 
