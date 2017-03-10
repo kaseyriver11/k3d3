@@ -1,0 +1,9 @@
+dependencies:
+  - name: d3
+    version: 3.5.2
+    src: "htmlwidgets/lib/aCTR_d3-3.5.2"
+    script: d3.min.js
+  - name: thecss
+    version: 0.0.1
+    src: "htmlwidgets/lib/aCTR_css"
+    stylesheet: aCTRcss.css
