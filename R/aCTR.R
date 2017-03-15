@@ -5,6 +5,8 @@
 #' @param data the json file being used for the visualizations.
 #' @param width width for the graph's frame area (in pixels) - default is null.
 #' @param height height for the graph's frame area (in pixels) - default is null.
+#' @param HT what is the maximum number of leaves in a column
+#' @param WD what is the maximum depth of the tree
 #' @param color1 the color of the circles which still have children - default lightbluesteel
 #' @param color2 the color of the circles whose children are already shown, or that do not have children - default black
 #' @param color3 the color of the outside of the circles - default steelblue
@@ -29,6 +31,9 @@
 aCTR <- function(data,
                 width = NULL,
                 height = NULL,
+                HT = 20,
+                WD = 6,
+                minimum_distance = 21,
                 top_bar = 'BRAND, SEGMENT, BASE SIZE, SUB1, SUB2, SUB3',
                 color1 = "lightsteelblue",
                 color2 = "#fff",
@@ -40,6 +45,9 @@ aCTR <- function(data,
     options = list(
         width = width,
         height = height,
+        HT = HT,
+        WD = WD,
+        minimum_distance = minimum_distance,
         top_bar = top_bar,
         color1 = color1,
         color2 = color2,

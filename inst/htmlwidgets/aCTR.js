@@ -21,17 +21,31 @@ HTMLWidgets.widget({
 renderValue: function(d, x, instance) {
 
 
-var margin = {top: 20, right: 20, bottom: 20, left: 120},
- width = 1800 - margin.right - margin.left,
- height = 800 - margin.top - margin.bottom;
+var windowsize = window.innerWidth;
+
+var margin = {top: 30, right: 20, bottom: 30, left: 120},
+ // width = 1800
+ height = Math.max((x.options.HT*21+120), 800); // minimum height of 800. 
+
+var spaceLeft = (((windowsize - x.options.WD*180)/2)-10)
 
 var i = 0,
  duration = 750,
  root;
 
+var maxdepth = x.options.HT // The maximum number of leaves in a single column - Calculated in R before loading data
+var maxwidth = x.options.WD // The maximum number of branches deep in a single line - Calculated in R before loading data
+
+var hSeparationBetweenNodes = Math.max(((800/x.options.HT)-2), x.options.minimum_distance); // 21 is the minimum to prevent overlap. However, if we have room - use it 
+var vSeparationBetweenNodes = 2;
+
 var tree = d3.layout.tree()
- .sort(function(a, b) { return d3.descending(Number(a.size), Number(b.size)); })
- .size([height, width]);
+	.sort(function(a, b) { return d3.descending(Number(a.size), Number(b.size)); })
+//	.size([height, width]); // Cannot used .size and .nodeSize together. .nodeSize covers .size // 
+    .nodeSize([hSeparationBetweenNodes, vSeparationBetweenNodes]) // This prevents overlap by making a minimum distance between nodes
+    .separation(function(a, b) {
+        return a.parent == b.parent ? 1 : 1.02;
+    });
 
 var diagonal = d3.svg.diagonal()
  .projection(function(d) { return [d.y, d.x]; });
@@ -41,34 +55,20 @@ var svg = d3.select(d).select("svg");
     svg.selectAll("*").remove();
     svg.selectAll("rect.negative").remove()
 
-// How far over should the visual start?	
-var movement = 1000;
-//var number2 = window.document.getElementById("id100").getBBox().width;
 
-// Lets add the text at the top
-var svg2 = d3.select(d).append("svg")
-	.attr("id", "svg2")
-	.attr("width", Math.max(width + margin.right + margin.left, x.options.width))
-	.attr("height", 40)
-	.append("g")
-	.attr("id", "header")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
- // DELETE . document.getElementById('d').innerHTML = '<div id="topnav"> <p style="position: fixed; top: 20; left:150 ; width:100%; text-align: center"> Hello </p> </div>';
-
- 
 // var svg = d3.select("body").append("svg")
 var svg = d3.select(d).append("svg")
 	.attr("id", "bigSVG")
-	.attr("width", Math.max(width + margin.right + margin.left, x.options.width))
-	.attr("height", Math.max(height + margin.top + margin.bottom, x.options.height))
+	//.attr("width", Math.max(width + margin.right + margin.left, x.options.width))
+	.attr("width", windowsize)
+	.attr("height", Math.max(height + margin.top + margin.bottom, x.options.height, x.options.minimum_distance*x.options.HT)) // added + 20 to give a tiny bit of extra room. 
 	.append("g")
-	.attr("id", "id100")
-	//.attr("transform", "translate(" + number + "," + margin.top + ")"); // This will control where the visual starts
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	.style("align", "center")
+	.attr("transform", "translate(" + spaceLeft + "," + (margin.top+(((hSeparationBetweenNodes)*maxdepth)/1.9) + 20) + ")"); // Where does the visual start
+	// We calculate how deep the tree is, and how much room we allowed. Then devide this in half to tell how far down to move the visual // 
     svg.selectAll("*").remove(); // REMOVE EXISTING
-	
-// var number = document.getElementById("id100").getAttribute("width"); // trying to find width of the g group
+
 
 var flare = JSON.parse(x.data); // d3.json("hi.json", function(error, flare)
     root = flare;
@@ -136,7 +136,7 @@ nodeEnter.append("text")
 // Transition nodes to their new position.
 var nodeUpdate = node.transition()
  .duration(duration)
- .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+ .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
 nodeUpdate.select("circle")
  .attr("r", function(d) { return 5*Math.sqrt(Number(d.size)/Math.PI) })
@@ -150,10 +150,8 @@ var nodeExit = node.exit().transition()
  .duration(duration)
  .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
  .remove();
-
 nodeExit.select("circle")
  .attr("r", 1e-6);
-
 nodeExit.select("text")
  .style("fill-opacity", 1e-6);
 
@@ -196,20 +194,6 @@ nodes.forEach(function(d) {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Toggle children on click.
 var keep = 0;
 function click(d) {
@@ -221,44 +205,54 @@ function click(d) {
             d._children = null;
             }
 
+var gs = svg.selectAll('g');
+// what is the tallest point?
+var keepHT = 0;
+for (a = 0; a < gs[0].length; a++){
+	k = gs[0][a].__data__.x0;
+	if( k < keepHT){
+		keepHT = k;
+	}
+}
+
 update(d);
+
 
 // How deep is the tree? 
 var gs = svg.selectAll('g');
+
 var keep = 0;
 for (a = 0; a < gs[0].length; a++){
 	k = gs[0][a].__data__.y0/180;
-	if( k > keep){
+	if( k > keep & jQuery(gs[0][a]).is(':visible')){
 		keep = k;
 	}
 }
-svg2.selectAll("*").remove(); // REMOVE EXISTING Text
-// Add the text back, faded out as needed 
-   for (aa = 0; aa < top_bar.length; aa++) {
-	   if(aa < (keep + 1)){
-		   opac = "1"
-	   }else{opac = ".33"}
-    svg2.append("text")
-        .attr("x", aa*180)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")
-		.style({"fill": "blue", "font-size": "16px", "fill-opacity": opac})
-        .text(top_bar[aa]);
-	if(aa < (top_bar.length-1) & aa < keep){
-		svg2.append("image")
-			.attr("xlink:href", "http://www.clker.com/cliparts/c/5/2/7/11949946211230256684line_line_arrow_end.svg.hi.png")
-			.attr("x", aa*180 + 75)
-			.attr("y", -20)
-			.attr("width", "24px")
-			.style({"fill-opacity": ".6"})
-			.attr("height", "24px")};  
-}	
-// console.log(gs)
+// what is the tallest point?
+var keepHT = 0;
+for (a = 0; a < gs[0].length; a++){
+	k = gs[0][a].__data__.x0;
+	if( k < keepHT & jQuery(gs[0][a]).is(':visible')){
+		keepHT = k;
+	}
 }
 
 
- 
- // How deep is the tree? 
+// Update the topbar text
+var toptext = svg.selectAll("text.topbar")    
+var textUpdate = toptext.transition()
+ .duration(duration*1.5)
+ .attr("y", keepHT - 20);
+
+// update the topbar image */
+var topimage = svg.selectAll("image.topbar")
+var imageUpdate = topimage.transition()
+ .duration(duration*1.5)
+ .attr("y", keepHT - 40);
+}
+
+
+// How deep is the original tree? 
 var gs = svg.selectAll('g');
 var keep = 0;
 for (a = 0; a < gs[0].length; a++){
@@ -267,29 +261,39 @@ for (a = 0; a < gs[0].length; a++){
 		keep = k;
 	}
 }
+// What is the tallest point of the original tree?
+var keepHT = 0;
+for (a = 0; a < gs[0].length; a++){
+	k = gs[0][a].__data__.x0;
+	if( k < keepHT){
+		keepHT = k;
+	}
+}
+
 // Add the original text && the original arrows
 var top_bar = x.options.top_bar.split(',') 	
-console.log(top_bar)
    for (aa = 0; aa < top_bar.length; aa++) {
 		if(aa < (keep + 1)){
 		   opac = "1"
 	    }else{opac = ".33"}
-    svg2.append("text")
+    svg.append("text")
+		.attr("class", "topbar")
         .attr("x", aa*180)             
-        .attr("y", 0)
+        .attr("y", keepHT-20)
         .attr("text-anchor", "middle")
 		.style({"fill": "blue", "font-size": "16px", "fill-opacity": opac})
         .text(top_bar[aa]);
 	if(aa < (top_bar.length-1)& aa < keep){
-		svg2.append("image")
+		svg.append("image")
+			.attr("class", "topbar")
 			.attr("xlink:href", "http://www.clker.com/cliparts/c/5/2/7/11949946211230256684line_line_arrow_end.svg.hi.png")
 			.attr("x", aa*180 + 75)
-			.attr("y", -20)
+			.attr("y", (keepHT-40))
 			.attr("width", "24px")
 			.style({"fill-opacity": ".6"})
 			.attr("height", "24px")};  
 }		 
-		
+
 
 },
 });

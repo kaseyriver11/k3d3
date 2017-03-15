@@ -7,7 +7,8 @@
 D3.js was created by Michael Bostock. See \url{http://d3js.org/}
 }
 \usage{
-aCTR(data, width = NULL, height = NULL,
+aCTR(data, width = NULL, height = NULL, HT = 20, WD = 6,
+  minimum_distance = 21,
   top_bar = "BRAND, SEGMENT, BASE SIZE, SUB1, SUB2, SUB3",
   color1 = "lightsteelblue", color2 = "#fff", color3 = "steelblue",
   color4 = "#ccc")
@@ -18,6 +19,10 @@ aCTR(data, width = NULL, height = NULL,
 \item{width}{width for the graph's frame area (in pixels) - default is null.}
 
 \item{height}{height for the graph's frame area (in pixels) - default is null.}
+
+\item{HT}{what is the maximum number of leaves in a column}
+
+\item{WD}{what is the maximum depth of the tree}
 
 \item{color1}{the color of the circles which still have children - default lightbluesteel}
 
