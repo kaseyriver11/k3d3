@@ -27,7 +27,7 @@ var margin = {top: 30, right: 20, bottom: 30, left: 120},
  // width = 1800
  height = Math.max((x.options.HT*21+120), 800); // minimum height of 800. 
 
-var spaceLeft = (((windowsize - x.options.WD*180)/2)-10)
+var spaceLeft = (((windowsize - x.options.WD*180)/4)-10)
 
 var i = 0,
  duration = 750,
@@ -122,7 +122,7 @@ nodeEnter.append("image")
 
 nodeEnter.append("text")
   .attr('font-family', 'FontAwesome')
-  .attr("x", function(d) { return d.children || d._children ? -10 : 2; })
+  .attr("x", function(d) { return d.children || d._children ? -2 : 2; })
   .attr('class', 'top-text')
   .attr("dy", "-0.15em")
   .attr("transform"," translate(17,0)")
@@ -272,8 +272,9 @@ for (a = 0; a < gs[0].length; a++){
 
 // Add the original text && the original arrows
 var top_bar = x.options.top_bar.split(',') 	
+console.log(top_bar)
    for (aa = 0; aa < top_bar.length; aa++) {
-		if(aa < (keep + 1)){
+		if(aa < (top_bar.length + 1)){
 		   opac = "1"
 	    }else{opac = ".33"}
     svg.append("text")
@@ -283,7 +284,7 @@ var top_bar = x.options.top_bar.split(',')
         .attr("text-anchor", "middle")
 		.style({"fill": "blue", "font-size": "16px", "fill-opacity": opac})
         .text(top_bar[aa]);
-	if(aa < (top_bar.length-1)& aa < keep){
+	if(aa < (top_bar.length-1)){
 		svg.append("image")
 			.attr("class", "topbar")
 			.attr("xlink:href", "http://www.clker.com/cliparts/c/5/2/7/11949946211230256684line_line_arrow_end.svg.hi.png")
