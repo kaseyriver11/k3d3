@@ -23,11 +23,13 @@ findValues <- function(df){
             dframe[j,(i+dd)] <- max(length(which(df$parent_name %in% strsplit(dframe[j,i], ";")[[1]])),1)
         }
     }
-    HT <<- max(colSums(dframe[,(dd+1):dim(dframe)[2]]))
-    WD <<- dd + 1
+    HT <- max(colSums(dframe[,(dd+1):dim(dframe)[2]]))
+    WD <- dd + 1
+
+    HTWD<- c(HT,WD)
 }
 
-findValues(df)
+HTWD <- findValues(df)
 
 
 
