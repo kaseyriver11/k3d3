@@ -24,10 +24,10 @@ renderValue: function(d, x, instance) {
 var windowsize = window.innerWidth;
 
 var margin = {top: 30, right: 20, bottom: 30, left: 120},
- // width = 1800
+ // width = 1900
  height = Math.max((x.options.HT*21+120), 800); // minimum height of 800. 
 
-var spaceLeft = (((windowsize - x.options.WD*180)/4)-10)
+var spaceLeft = (((windowsize - x.options.WD*190)/4)-10)
 
 var i = 0,
  duration = 750,
@@ -96,7 +96,7 @@ function update(source) {
     links = tree.links(nodes);
 
 // Normalize for fixed-depth.
- nodes.forEach(function(d) { d.y = d.depth * 180; });
+ nodes.forEach(function(d) { d.y = d.depth * 190; });
 
 // Update the nodes.
 var node = svg.selectAll("g.node")
@@ -111,7 +111,7 @@ var nodeEnter = node.enter().append("g")
  
 nodeEnter.append("circle")
  .attr("r", function(d) { return d.size; })
- .style({"fill": function(d) { return d._children ? x.options.color1 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"});
+ .style({"fill": function(d) { return d._children ? x.options.color3 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"});
 
 nodeEnter.append("image")
   .attr("xlink:href", function(d) { return d.icon; })
@@ -140,7 +140,8 @@ var nodeUpdate = node.transition()
 
 nodeUpdate.select("circle")
  .attr("r", function(d) { return 5*Math.sqrt(Number(d.size)/Math.PI) })
- .style("fill", function(d) { return d._children ? x.options.color1 : d.level; });
+ //.style("fill", function(d) { return d._children ? x.options.color1 : d.level; }); 
+ .style("fill", x.options.color1); 
 
 nodeUpdate.select("text")
  .style("fill-opacity", 1);
@@ -223,7 +224,7 @@ var gs = svg.selectAll('g');
 
 var keep = 0;
 for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.y0/180;
+	k = gs[0][a].__data__.y0/190;
 	if( k > keep & jQuery(gs[0][a]).is(':visible')){
 		keep = k;
 	}
@@ -256,7 +257,7 @@ var imageUpdate = topimage.transition()
 var gs = svg.selectAll('g');
 var keep = 0;
 for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.y0/180;
+	k = gs[0][a].__data__.y0/190;
 	if( k > keep){
 		keep = k;
 	}
@@ -279,7 +280,7 @@ console.log(top_bar)
 	    }else{opac = ".33"}
     svg.append("text")
 		.attr("class", "topbar")
-        .attr("x", aa*180)             
+        .attr("x", aa*190)             
         .attr("y", keepHT-20)
         .attr("text-anchor", "middle")
 		.style({"fill": "blue", "font-size": "16px", "fill-opacity": opac})
@@ -288,7 +289,7 @@ console.log(top_bar)
 		svg.append("image")
 			.attr("class", "topbar")
 			.attr("xlink:href", "http://www.clker.com/cliparts/c/5/2/7/11949946211230256684line_line_arrow_end.svg.hi.png")
-			.attr("x", aa*180 + 75)
+			.attr("x", aa*190 + 75)
 			.attr("y", (keepHT-40))
 			.attr("width", "24px")
 			.style({"fill-opacity": ".6"})
@@ -316,11 +317,12 @@ function wrap(text, width) {
                         .attr("x", x)
                         .attr("y", y)
                         .attr("dy", dy + "em");
-
+			console.log(words)
         while (word = words.pop()) {
+			console.log(word == "(")
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
+            if (tspan.node().getComputedTextLength() > width & (["(", "+", "-"].includes(word) || /^[a-zA-Z]+$/.test(word))) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
