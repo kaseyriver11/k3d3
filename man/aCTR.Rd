@@ -7,7 +7,7 @@
 D3.js was created by Michael Bostock. See \url{http://d3js.org/}
 }
 \usage{
-aCTR(data, width = NULL, height = NULL, HT = 20, WD = 6,
+aCTR(data, width = 500, height = 1000, HT = 20, WD = 6, maxChar = 50,
   minimum_distance = 21,
   top_bar = "BRAND, SEGMENT, BASE SIZE, SUB1, SUB2, SUB3",
   color1 = "lightsteelblue", color2 = "#fff", color3 = "steelblue",

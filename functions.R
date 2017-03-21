@@ -25,11 +25,12 @@ findValues <- function(df){
     }
     HT <- max(colSums(dframe[,(dd+1):dim(dframe)[2]]))
     WD <- dd + 1
+    maxChar <- max(nchar(df$node_name)+2)
 
-    HTWD<- c(HT,WD)
+    keepValues <- c(HT,WD, maxChar)
 }
 
-HTWD <- findValues(df)
+keepValues <- findValues(df)
 
 
 
