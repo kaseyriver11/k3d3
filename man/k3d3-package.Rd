@@ -2,10 +2,9 @@
 % Please edit documentation in R/k3d3.R
 \docType{package}
 \name{k3d3-package}
-\alias{k3d3}
 \alias{k3d3-package}
+\alias{k3d3}
 \title{R package to create D3 visualizations}
 \description{
 D3 JavaScript tree, and hierarchical graphs using R.
 }
-

@@ -54,4 +54,3 @@ html_print(tagList(ICICLE(jsonIcicle, mousemove = JSmousemove),
                 )
 ))
 }
-

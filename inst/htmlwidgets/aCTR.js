@@ -25,8 +25,8 @@ renderValue: function(d, x, instance) {
 
 var margin = {top: 30, right: 20, bottom: 30, left: 120},
     width = (x.options.WD*225 +50),
-	height = Math.max((x.options.HT*21+120), 800); // minimum height of 800. 
-console.log(width)
+	height = Math.max((x.options.HT*21+40), 800); // minimum height of 800. 
+console.log(height)
 var windowsize = window.innerWidth;
  // var spaceLeft = (((windowsize - x.options.WD*225)/4)-10);
 var spaceLeft = 50; // move visual over 10 pixels
@@ -40,7 +40,6 @@ var maxdepth = x.options.HT // The maximum number of leaves in a single column -
 var maxwidth = x.options.WD // The maximum number of branches deep in a single line - Calculated in R before loading data
 
 var createSpace = Math.ceil(x.options.maxChar/28)*12
-console.log(x.options.WD, x.options.maxChar)
 var hSeparationBetweenNodes = Math.max(((800/x.options.HT)-2), x.options.minimum_distance, createSpace); // 21 is the minimum to prevent overlap. However, if we have room - use it 
 var vSeparationBetweenNodes = 2;
 
@@ -297,7 +296,7 @@ var top_bar = x.options.top_bar.split(',')
 	if(aa < (top_bar.length-1)){
 		svg.append("image")
 			.attr("class", "topbar")
-			.attr("xlink:href", "http://www.clker.com/cliparts/c/5/2/7/11949946211230256684line_line_arrow_end.svg.hi.png")
+			.attr("xlink:href", "https://cdn.pixabay.com/photo/2016/04/07/19/11/arrow-1314515_960_720.png")
 			.attr("x", aa*225 + 112)
 			.attr("y", (keepHT-40))
 			.attr("width", "24px")
@@ -306,10 +305,10 @@ var top_bar = x.options.top_bar.split(',')
 }		 
 
 // Make div invisable for a short period of time
-function showIt2() {
-  document.getElementById("bigSVG").style.visibility = "visible";
-}
-setTimeout("showIt2()", 1000);
+//function showIt2() {
+//  document.getElementById("bigSVG").style.visibility = "visible";
+//}
+//setTimeout("showIt2()", 1000);
 // Scroll the DIV element treeHolder into view 
 var objDiv = document.getElementById("treeHolder");
 $(document).ready(function(){
@@ -337,11 +336,9 @@ function wrap(text, width) {
                         .attr("x", x)
                         .attr("y", y)
                         .attr("dy", dy + "em");
-		// console.log(words)
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-			console.log(tspan.text().length);
             if (tspan.node().getComputedTextLength() > width & (["(", "+", "-"].includes(word) || /^[a-zA-Z]+$/.test(word))
 				| (tspan.text().length > 30 & word.length > 4)) { 
 				//| tspan.node().getComputedTextLength() + 10 > width & word.length > 6) {
