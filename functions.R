@@ -20,9 +20,13 @@ findValues <- function(df){
     for(i in 1:dd){
         dframe[,(i+dd)] <- 1
         for(j in 1:20){
+            # Count which nodes don't have a sub tree
+            count <-  length(which(!(strsplit(dframe[j,i], ";")[[1]] %in% dfkeep$parent_name)))
             dframe[j,(i+dd)] <- max(length(which(df$parent_name %in% strsplit(dframe[j,i], ";")[[1]])),1)
+            dframe[j,(i+dd)] <- dframe[j,(i+dd)] + count
         }
     }
+    dframe <- dframe[is.na(dframe$level1) == FALSE,]
     HT <- max(colSums(dframe[,(dd+1):dim(dframe)[2]]))
     WD <- dd + 1
     maxChar <- max(nchar(df$node_name)+2)
@@ -30,7 +34,54 @@ findValues <- function(df){
     keepValues <- c(HT,WD, maxChar)
 }
 
-keepValues <- findValues(df)
+keepValues <- findValues(dfkeep)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dframe <- as.data.frame(dfkeep$node_name[2:(length(which(dfkeep$parent_name == dfkeep$node_name[1]))+1)])
+colnames(dframe) <- "name"
+dframe$name <- as.character(dframe$name)
+# Go through each node, finding the names of the children
+for(i in 1:20){
+    round = i
+    level <- paste0("level", round)
+    for(i in 1:dim(dframe)[1]){
+        dframe[i,level] <- paste(dfkeep$node_name[which(dfkeep$parent_name %in% strsplit(dframe[i,round], ";")[[1]])], collapse = ";")
+    }
+}
+# Trim off anything extra
+dframe <- dframe[ ,which(sapply(dframe, function(x) all(x == "")) == FALSE)]
+# Find the column with the maximum numbers of leaves
+dd <- dim(dframe)[2]
+for(i in 1:dd){
+    dframe[,(i+dd)] <- 1
+    for(j in 1:20){
+        # Count which nodes don't have a sub tree
+        count <-  length(which(!(strsplit(dframe[j,i], ";")[[1]] %in% dfkeep$parent_name)))
+        dframe[j,(i+dd)] <- max(length(which(dfkeep$parent_name %in% strsplit(dframe[j,i], ";")[[1]])),1)
+        dframe[j,(i+dd)] <- dframe[j,(i+dd)] + count
+    }
+}
+dframe <- dframe[is.na(dframe$level1) == FALSE,]
+HT <- max(colSums(dframe[,(dd+1):dim(dframe)[2]]))
+WD <- dd + 1
+maxChar <- max(nchar(df$node_name)+2)
+
+keepValues <- c(HT,WD, maxChar)
 
 

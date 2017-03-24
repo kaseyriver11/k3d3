@@ -7,8 +7,8 @@
 D3.js was created by Michael Bostock. See \url{http://d3js.org/}
 }
 \usage{
-aCTR(data, width = 500, height = 1000, HT = 20, WD = 6, maxChar = 50,
-  minimum_distance = 21,
+aCTR(data, width = 500, height = 300, HT = 20, WD = 6, maxChar = 50,
+  maxsize = 20, minimum_distance = 21,
   top_bar = "BRAND, SEGMENT, BASE SIZE, SUB1, SUB2, SUB3",
   color1 = "lightsteelblue", color2 = "#fff", color3 = "steelblue",
   color4 = "#ccc")
@@ -23,6 +23,10 @@ aCTR(data, width = 500, height = 1000, HT = 20, WD = 6, maxChar = 50,
 \item{HT}{what is the maximum number of leaves in a column}
 
 \item{WD}{what is the maximum depth of the tree}
+
+\item{maxChar}{what is the maximum number of characters in a nodes text}
+
+\item{maxsize}{what is the root nodes size}
 
 \item{color1}{the color of the circles which still have children - default lightbluesteel}
 

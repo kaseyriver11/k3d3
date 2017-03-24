@@ -7,7 +7,7 @@ HTMLWidgets.widget({
   initialize: function(d, width, height) {
      d3.select(d).append("svg")
       .attr("width", 100)
-      .attr("height", 100);
+      .attr("height", 1);
 
     return d3.layout.tree();
   },
@@ -25,8 +25,9 @@ renderValue: function(d, x, instance) {
 
 var margin = {top: 30, right: 20, bottom: 30, left: 120},
     width = (x.options.WD*225 +50),
-	height = Math.max((x.options.HT*21+40), 800); // minimum height of 800. 
+	height = Math.max((x.options.HT*21+60), 300); // minimum height of 800. 
 console.log(height)
+console.log(x.options)
 var windowsize = window.innerWidth;
  // var spaceLeft = (((windowsize - x.options.WD*225)/4)-10);
 var spaceLeft = 50; // move visual over 10 pixels
@@ -40,8 +41,11 @@ var maxdepth = x.options.HT // The maximum number of leaves in a single column -
 var maxwidth = x.options.WD // The maximum number of branches deep in a single line - Calculated in R before loading data
 
 var createSpace = Math.ceil(x.options.maxChar/28)*12
-var hSeparationBetweenNodes = Math.max(((800/x.options.HT)-2), x.options.minimum_distance, createSpace); // 21 is the minimum to prevent overlap. However, if we have room - use it 
+var hSeparationBetweenNodes = Math.max(((400/x.options.HT)-2), x.options.minimum_distance, createSpace); // if we have room - use it 
 var vSeparationBetweenNodes = 2;
+console.log(hSeparationBetweenNodes)
+// over write height
+var height = Math.max((hSeparationBetweenNodes*x.options.HT+60), 300);
 
 var tree = d3.layout.tree()
 	.sort(function(a, b) { return d3.descending(Number(a.size), Number(b.size)); })
@@ -59,17 +63,17 @@ var svg = d3.select(d).select("svg");
     svg.selectAll("*").remove();
     svg.selectAll("rect.negative").remove()
 
-
+console.log(height)
 // var svg = d3.select("body").append("svg")
 var svg = d3.select(d).append("svg")
 	.attr("id", "bigSVG")
 	.attr("width",(width + margin.right + margin.left))
 	//.attr("width", Math.max(width + margin.right + margin.left, x.options.width))
 	//.attr("width", windowsize)
-	.attr("height", Math.max(height + margin.top + margin.bottom, x.options.height, x.options.minimum_distance*x.options.HT)) // added + 20 to give a tiny bit of extra room. 
+	.attr("height", Math.max(height + margin.top + margin.bottom, x.options.height, x.options.minimum_distance*x.options.HT + 20)) // added + 20 to give a tiny bit of extra room. 
 	.append("g")
 	.style("align", "center")
-	.attr("transform", "translate(" + spaceLeft + "," + (margin.top+(((hSeparationBetweenNodes)*maxdepth)/1.9) + 20) + ")"); // Where does the visual start
+	.attr("transform", "translate(" + spaceLeft + "," + ((((hSeparationBetweenNodes)*maxdepth)/1.9)+120) + ")"); // Where does the visual start
 	// We calculate how deep the tree is, and how much room we allowed. Then devide this in half to tell how far down to move the visual // 
     svg.selectAll("*").remove(); // REMOVE EXISTING
 
@@ -114,8 +118,8 @@ var nodeEnter = node.enter().append("g")
  .on("click", click);
  
 nodeEnter.append("circle")
- .attr("r", function(d) { if(d.icon == ""){return d.size}else{return 0}})
- // .attr("r", function(d) { return d.icon ? 0 : d.size})
+  //.attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize)/Math.PI)}else{return 0}}) // update 
+  .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize))}else{return 0}}) // update 
  .style({"fill": function(d) { return d._children ? x.options.color3 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"})
  //.style({"opacity": function(d) {if(d.icon == ""){0}}});
 
@@ -145,9 +149,8 @@ var nodeUpdate = node.transition()
  .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
 nodeUpdate.select("circle")
- .attr("r", function(d) { return 5*Math.sqrt(Number(d.size)/Math.PI) })
- .attr("r", function(d) { if(d.icon == ""){return 5*Math.sqrt(Number(d.size)/Math.PI) }else{return 0}})
- //.style("fill", function(d) { return d._children ? x.options.color1 : d.level; }); 
+ // .attr("r", function(d) { return 5*Math.sqrt(Number(d.size)/Math.PI) })
+ .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize))}else{return 0}}) // update
  .style("fill", x.options.color1); 
 
 nodeUpdate.select("text")
@@ -205,7 +208,6 @@ nodes.forEach(function(d) {
 // Toggle children on click.
 var keep = 0;
 function click(d) {
-	console.log(d.icon)
     if (d.children) {
         d._children = d.children;
         d.children = null;
@@ -304,15 +306,11 @@ var top_bar = x.options.top_bar.split(',')
 			.attr("height", "24px")};  
 }		 
 
-// Make div invisable for a short period of time
-//function showIt2() {
-//  document.getElementById("bigSVG").style.visibility = "visible";
-//}
-//setTimeout("showIt2()", 1000);
-// Scroll the DIV element treeHolder into view 
+// Scroll the visual into view. 
 var objDiv = document.getElementById("treeHolder");
 $(document).ready(function(){
-     $('div,treeHolder').animate({scrollTop: ((objDiv.scrollHeight/2)+keepHT - 50)}, 800); 
+     $('div,treeHolder').animate({scrollTop: ((objDiv.scrollHeight/2)+keepHT - 10)}, 800); 
+    // $('div,treeHolder').animate({scrollBottom: ((height/2)+keepHT - 60)}, 800); 
 
 });
 

@@ -7,6 +7,8 @@
 #' @param height height for the graph's frame area (in pixels) - default is null.
 #' @param HT what is the maximum number of leaves in a column
 #' @param WD what is the maximum depth of the tree
+#' @param maxChar what is the maximum number of characters in a nodes text
+#' @param maxsize what is the root nodes size
 #' @param color1 the color of the circles which still have children - default lightbluesteel
 #' @param color2 the color of the circles whose children are already shown, or that do not have children - default black
 #' @param color3 the color of the outside of the circles - default steelblue
@@ -30,10 +32,11 @@
 #' @export
 aCTR <- function(data,
                 width = 500,
-                height = 1000,
+                height = 300,
                 HT = 20,
                 WD = 6,
                 maxChar = 50,
+                maxsize=20,
                 minimum_distance = 21,
                 top_bar = 'BRAND, SEGMENT, BASE SIZE, SUB1, SUB2, SUB3',
                 color1 = "lightsteelblue",
@@ -49,6 +52,7 @@ aCTR <- function(data,
         HT = HT,
         WD = WD,
         maxChar = maxChar,
+        maxsize=maxsize,
         minimum_distance = minimum_distance,
         top_bar = top_bar,
         color1 = color1,
