@@ -1,7 +1,6 @@
 HTMLWidgets.widget({
 
   name: 'aCTR',
-
   type: 'output',
 
   initialize: function(d, width, height) {
@@ -11,27 +10,18 @@ HTMLWidgets.widget({
 
     return d3.layout.tree();
   },
-
   resize: function(d, width, height) {
      d3.select(d).select("svg")
-      .attr("width", 100)
-      .attr("height", 100);
+      .attr("width", x.options.WD*225+50) // must make it large enough to handle being closed and opening back up - NOT sure why this works
+      .attr("height",x.options.HT*40);    // must make it large enough to handle being closed and opening back up - NOT sure why this works
   },
 
 renderValue: function(d, x, instance) {
 
 
-
-
 var margin = {top: 30, right: 20, bottom: 30, left: 120},
-    width = (x.options.WD*225 +50),
+    width = (x.options.WD*225),
 	height = Math.max((x.options.HT*21+60), 300); // minimum height of 800. 
-console.log(height)
-console.log(x.options)
-var windowsize = window.innerWidth;
- // var spaceLeft = (((windowsize - x.options.WD*225)/4)-10);
-var spaceLeft = 50; // move visual over 10 pixels
-
 
 var i = 0,
  duration = 750,
@@ -43,8 +33,6 @@ var maxwidth = x.options.WD // The maximum number of branches deep in a single l
 var createSpace = Math.ceil(x.options.maxChar/28)*12
 var hSeparationBetweenNodes = Math.max(((400/x.options.HT)-2), x.options.minimum_distance, createSpace); // if we have room - use it 
 var vSeparationBetweenNodes = 2;
-console.log(hSeparationBetweenNodes)
-// over write height
 var height = Math.max((hSeparationBetweenNodes*x.options.HT+60), 300);
 
 var tree = d3.layout.tree()
@@ -59,26 +47,20 @@ var diagonal = d3.svg.diagonal()
  .projection(function(d) { return [d.y, d.x]; });
  
 // Remove the previous svg element
-var svg = d3.select(d).select("svg");
+var svg = d3.selectAll('.col-sm-12 svg').remove(); // Only works with PG Application. They have set a specific DIV element. Call it by nam --- Else use: var svg = d3.select(d).select("svg");
     svg.selectAll("*").remove();
     svg.selectAll("rect.negative").remove()
 
-console.log(height)
-// var svg = d3.select("body").append("svg")
 var svg = d3.select(d).append("svg")
-	.attr("id", "bigSVG")
-	.attr("width",(width + margin.right + margin.left))
-	//.attr("width", Math.max(width + margin.right + margin.left, x.options.width))
-	//.attr("width", windowsize)
-	.attr("height", Math.max(height + margin.top + margin.bottom, x.options.height, x.options.minimum_distance*x.options.HT + 20)) // added + 20 to give a tiny bit of extra room. 
+	.attr("id", "mainSVG")
+	.attr("width",(width + 100))
+	.attr("height", 600)
 	.append("g")
 	.style("align", "center")
-	.attr("transform", "translate(" + spaceLeft + "," + ((((hSeparationBetweenNodes)*maxdepth)/1.9)+120) + ")"); // Where does the visual start
-	// We calculate how deep the tree is, and how much room we allowed. Then devide this in half to tell how far down to move the visual // 
+	.attr("transform", "translate(" + 50 + "," + 50 + ")"); // Where does the visual start - 50 units to the left, 50 units down (to leave room for the top bar) 
     svg.selectAll("*").remove(); // REMOVE EXISTING
 
-
-var flare = JSON.parse(x.data); // d3.json("hi.json", function(error, flare)
+var flare = JSON.parse(x.data);
     root = flare;
     root.x0 = height / 2;
     root.y0 = 0;
@@ -96,117 +78,132 @@ update(root);
 
 d3.select(self.frameElement).style("height", "800px");
 
-var keep = 0 // need this to see how far the tree has grown
-
 function update(source) {
-    // Compute the new tree layout.
-    var nodes = tree.nodes(root).reverse(),
-    links = tree.links(nodes);
+	
+	// This function will find how deep the tree is at a given point // 
+	var duration = d3.event && d3.event.altKey ? 5000 : 500;
+	// compute the new height
+	var levelWidth = [1];
+	var childCount = function(level, n) {
+	if(n.children && n.children.length > 0) {
+		if(levelWidth.length <= level + 1) levelWidth.push(0);
+		levelWidth[level+1] += n.children.length;
+		n.children.forEach(function(d) {
+			childCount(level + 1, d);
+			});
+			}
+			};
+  childCount(0, root);  
+	// Update the height of the tree
+	var newHeight = Math.max(d3.max(levelWidth) * hSeparationBetweenNodes + 120, 420); // make sure we leave enough space with a minimum of 420 as the height
+		tree = tree.size([newHeight, width]);
+  
+	// Compute the new tree layout.
+	var nodes = tree.nodes(root).reverse(),
+		links = tree.links(nodes);
 
-// Normalize for fixed-depth.
- nodes.forEach(function(d) { d.y = d.depth * 225; });
+	// Normalize for fixed-depth.
+	 nodes.forEach(function(d) { d.y = d.depth * 225; });
 
-// Update the nodes.
-var node = svg.selectAll("g.node")
- .data(nodes, function(d) { return d.id || (d.id = ++i); })
- .style("cursor", "pointer");
+	// Update the nodes.
+	var node = svg.selectAll("g.node")
+	 .data(nodes, function(d) { return d.id || (d.id = ++i); })
+	 .style("cursor", "pointer");
+	 
+	// Enter any new nodes at the parent's previous position.
+	var nodeEnter = node.enter().append("g")
+	 .attr("class", "node")
+	 .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; }) // Where do the pieces move from? 
+	 .on("click", click);
+	 
+	nodeEnter.append("circle")
+	  .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize))}else{return 0}}) // update 
+	  .style({"fill": function(d) { return d._children ? x.options.color3 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"});
+	  //.style("fill-opacity", .6);
+
+	nodeEnter.append("image")
+	  .attr("xlink:href", function(d) { return d.icon; })
+	  .attr("x", "-12px")
+	  .attr("y", "-12px")
+	  .attr("width", "24px")
+	  .attr("height", "24px");  
+
+	nodeEnter.append("text")
+	  .attr('font-family', 'FontAwesome')
+	  .attr("x", function(d) { return d.children || d._children ? -2 : 2; })
+	  .attr('class', 'top-text')
+	  .attr("dy", "-0.15em")
+	  .attr("transform"," translate(17,0)")
+	  .attr("text-anchor", "start")//function(d) { return d.children || d._children ? "start" : "end"; })
+	  .style({"font": "10px sans-serif", "fill-opacity": 1e-6})
+	  .text(function(d) { return d.name; })
+	  .call(wrap,150); // Custom wrapping function to move text down as needed.
  
-// Enter any new nodes at the parent's previous position.
-var nodeEnter = node.enter().append("g")
- .attr("class", "node")
- .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; }) // Where do the pieces move from? 
- .on("click", click);
- 
-nodeEnter.append("circle")
-  //.attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize)/Math.PI)}else{return 0}}) // update 
-  .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize))}else{return 0}}) // update 
- .style({"fill": function(d) { return d._children ? x.options.color3 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"})
- //.style({"opacity": function(d) {if(d.icon == ""){0}}});
+	// Transition nodes to their new position.
+	var nodeUpdate = node.transition()
+	 .duration(duration)
+	 .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
-nodeEnter.append("image")
-  .attr("xlink:href", function(d) { return d.icon; })
-  .attr("x", "-12px")
-  .attr("y", "-12px")
-  .attr("width", "24px")
-  .attr("height", "24px");  
+	nodeUpdate.select("circle")
+	 .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(2.5*d.size/x.options.maxsize))}else{return 0}}) // UPDATE
+	 .style("fill-opacity", function(d) { if(Math.sqrt((2.5*d.size/x.options.maxsize)) > 15) {return .6}else{return 1}}) 
+	 .style("fill", x.options.color1); 
 
-nodeEnter.append("text")
-  .attr('font-family', 'FontAwesome')
-  .attr("x", function(d) { return d.children || d._children ? -2 : 2; })
-  .attr('class', 'top-text')
-  .attr("dy", "-0.15em")
-  .attr("transform"," translate(17,0)")
-  .attr("text-anchor", "start")//function(d) { return d.children || d._children ? "start" : "end"; })
-  .style({"font": "10px sans-serif", "fill-opacity": 1e-6})
-  .text(function(d) { return d.name; })
-  .call(wrap,150);
- 
+	nodeUpdate.select("text")
+	 .style("fill-opacity", 1);
 
-// Transition nodes to their new position.
-// Transition nodes to their new position.
-var nodeUpdate = node.transition()
- .duration(duration)
- .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+	// Transition exiting nodes to the parent's new position.
+	var nodeExit = node.exit().transition()
+	 .duration(duration)
+	 .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+	 .remove();
+	nodeExit.select("circle")
+	 .attr("r", 1e-6);
+	nodeExit.select("text")
+	 .style("fill-opacity", 1e-6);
 
-nodeUpdate.select("circle")
- // .attr("r", function(d) { return 5*Math.sqrt(Number(d.size)/Math.PI) })
- .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize))}else{return 0}}) // update
- .style("fill", x.options.color1); 
+	// Update the links.
+	var link = svg.selectAll("path.link")
+	 .data(links, function(d) { return d.target.id; })
+	 .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"});
 
-nodeUpdate.select("text")
- .style("fill-opacity", 1);
+	// Enter any new links at the parent's previous position.
+	link.enter().insert("path", "g")
+	 .attr("class", "link")
+	 .attr("d", function(d) {
+		 var o = {x: source.x0, y: source.y0};
+		 return diagonal({source: o, target: o});
+		 })
+	 .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"});
 
-// Transition exiting nodes to the parent's new position.
-var nodeExit = node.exit().transition()
- .duration(duration)
- .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
- .remove();
-nodeExit.select("circle")
- .attr("r", 1e-6);
-nodeExit.select("text")
- .style("fill-opacity", 1e-6);
+	// Transition links to their new position.
+	link.transition()
+	 .duration(duration)
+	 .attr("d", diagonal)
+	 .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"});
 
-// Update the links.
-var link = svg.selectAll("path.link")
- .data(links, function(d) { return d.target.id; })
- .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"});
+	// Transition exiting nodes to the parent's new position.
+	link.exit().transition()
+	 .duration(duration)
+	 .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"})
+	 .attr("d", function(d) {
+	 var o = {x: source.x, y: source.y};
+	 return diagonal({source: o, target: o});
+	 })
+	 .remove();
 
-// Enter any new links at the parent's previous position.
-link.enter().insert("path", "g")
- .attr("class", "link")
- .attr("d", function(d) {
-     var o = {x: source.x0, y: source.y0};
-     return diagonal({source: o, target: o});
-     })
- .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"});
-
-// Transition links to their new position.
-link.transition()
- .duration(duration)
- .attr("d", diagonal)
- .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"});
-
-// Transition exiting nodes to the parent's new position.
-link.exit().transition()
- .duration(duration)
- .style({"fill": "none", "stroke": x.options.color4, "stroke-width": "1.5px"})
- .attr("d", function(d) {
- var o = {x: source.x, y: source.y};
- return diagonal({source: o, target: o});
- })
- .remove();
-
-// Stash the old positions for transition.
-nodes.forEach(function(d) {
-    d.x0 = d.x;
-    d.y0 = d.y;
-    });
-
+	// Stash the old positions for transition.
+	nodes.forEach(function(d) {
+		d.x0 = d.x;
+		d.y0 = d.y;
+		});
+	// Make the SVG bigger if needed (or smaller) //
+	document.getElementById('mainSVG').setAttribute("height", (newHeight+90));
     }
 
+	
 
 // Toggle children on click.
-var keep = 0;
 function click(d) {
     if (d.children) {
         d._children = d.children;
@@ -216,71 +213,9 @@ function click(d) {
             d._children = null;
             }
 
-var gs = svg.selectAll('g');
-// what is the tallest point?
-var keepHT = 0;
-for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.x0;
-	if( k < keepHT){
-		keepHT = k;
-	}
-}
-
 update(d);
-
-
-// How deep is the tree? 
-var gs = svg.selectAll('g');
-
-var keep = 0;
-for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.y0/225;
-	if( k > keep & jQuery(gs[0][a]).is(':visible')){
-		keep = k;
-	}
-}
-// what is the tallest point?
-var keepHT = 0;
-for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.x0;
-	if( k < keepHT & jQuery(gs[0][a]).is(':visible')){
-		keepHT = k;
-	}
 }
 
-
-// Update the topbar text
-var toptext = svg.selectAll("text.topbar")    
-var textUpdate = toptext.transition()
- .duration(duration*1.5)
- .attr("y", keepHT - 20);
-
-// update the topbar image */
-var topimage = svg.selectAll("image.topbar")
-var imageUpdate = topimage.transition()
- .duration(duration*1.5)
- .attr("y", keepHT - 40);
-}
-
-
-// How deep is the original tree? 
-var gs = svg.selectAll('g');
-
-var keep = 0;
-for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.y0/225;
-	if( k > keep){
-		keep = k;
-	}
-}
-// What is the tallest point of the original tree?
-var keepHT = 0;
-for (a = 0; a < gs[0].length; a++){
-	k = gs[0][a].__data__.x0;
-	if( k < keepHT){
-		keepHT = k;
-	}
-}
 
 // Add the original text && the original arrows
 var top_bar = x.options.top_bar.split(',') 
@@ -291,7 +226,7 @@ var top_bar = x.options.top_bar.split(',')
     svg.append("text")
 		.attr("class", "topbar")
         .attr("x", aa*225)             
-        .attr("y", keepHT-20)
+        .attr("y", -20)
         .attr("text-anchor", "middle")
 		.style({"fill": "blue", "font-size": "16px", "fill-opacity": opac})
         .text(top_bar[aa]);
@@ -300,19 +235,11 @@ var top_bar = x.options.top_bar.split(',')
 			.attr("class", "topbar")
 			.attr("xlink:href", "https://cdn.pixabay.com/photo/2016/04/07/19/11/arrow-1314515_960_720.png")
 			.attr("x", aa*225 + 112)
-			.attr("y", (keepHT-40))
+			.attr("y", -40)
 			.attr("width", "24px")
 			.style({"fill-opacity": ".6"})
 			.attr("height", "24px")};  
 }		 
-
-// Scroll the visual into view. 
-var objDiv = document.getElementById("treeHolder");
-$(document).ready(function(){
-     $('div,treeHolder').animate({scrollTop: ((objDiv.scrollHeight/2)+keepHT - 10)}, 800); 
-    // $('div,treeHolder').animate({scrollBottom: ((height/2)+keepHT - 60)}, 800); 
-
-});
 
 },
 });
