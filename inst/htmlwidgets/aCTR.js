@@ -117,9 +117,9 @@ function update(source) {
 	 .on("click", click);
 	 
 	nodeEnter.append("circle")
-	  .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(d.size/x.options.maxsize))}else{return 0}}) // update 
-	  .style({"fill": function(d) { return d._children ? x.options.color3 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"});
-	  //.style("fill-opacity", .6);
+	  .attr("r", function(d) { return Math.sqrt(Number(1.5*d.size/x.options.maxsize))}) // update 
+	  .style({"fill": function(d) { return d._children ? x.options.color3 : d.level}, "stroke": x.options.color3, "stroke-width":"1.5px"})
+	  .style("fill", function(d) { if(d.icon == ""){return d._children ? x.options.color3 : d.level} else {return x.options.color2} });
 
 	nodeEnter.append("image")
 	  .attr("xlink:href", function(d) { return d.icon; })
@@ -145,9 +145,10 @@ function update(source) {
 	 .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
 	nodeUpdate.select("circle")
-	 .attr("r", function(d) { if(d.icon == ""){return Math.sqrt(Number(2.5*d.size/x.options.maxsize))}else{return 0}}) // UPDATE
-	 .style("fill-opacity", function(d) { if(Math.sqrt((2.5*d.size/x.options.maxsize)) > 15) {return .6}else{return 1}}) 
-	 .style("fill", x.options.color1); 
+	 .attr("r", function(d) { return Math.sqrt(Number(1.5*d.size/x.options.maxsize))}) // UPDATE
+	 .style("fill-opacity", function(d) { if(Math.sqrt((1.5*d.size/x.options.maxsize)) > 15) {return .6}else{return 1}}) 
+	 .style("fill", x.options.color1)
+	 .style("fill", function(d) { if(d.icon == ""){return d._children ? x.options.color3 : d.level}else{return x.options.color2} });
 
 	nodeUpdate.select("text")
 	 .style("fill-opacity", 1);
