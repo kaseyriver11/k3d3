@@ -12,8 +12,8 @@ HTMLWidgets.widget({
   },
   resize: function(d, width, height) {
      d3.select(d).select("svg")
-      .attr("width", x.options.WD*225+50) // must make it large enough to handle being closed and opening back up - NOT sure why this works
-      .attr("height",x.options.HT*40);    // must make it large enough to handle being closed and opening back up - NOT sure why this works
+      .attr("width", 10000) // must make it large enough to handle being closed and opening back up - NOT sure why this works
+      .attr("height",10000);    // must make it large enough to handle being closed and opening back up - NOT sure why this works
   },
 
 renderValue: function(d, x, instance) {
@@ -51,6 +51,7 @@ var svg = d3.selectAll('.col-sm-12 svg').remove(); // Only works with PG Applica
     svg.selectAll("*").remove();
     svg.selectAll("rect.negative").remove()
 
+console.log(x.options)
 var svg = d3.select(d).append("svg")
 	.attr("id", "mainSVG")
 	.attr("width",(width + 100))
@@ -73,15 +74,40 @@ function collapse(d) {
         }
         }
 
+// UPDATES KJ //
+// Toggle children on click.
+function expand(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update(d);
+}
+
+function expandAll(){
+    expand(root); 
+    update(root);
+}
+
+function collapseAll(){
+    root.children.forEach(collapse);
+    collapse(root);
+    update(root);
+}		
+
 //root.children.forEach(collapse);
+document.getElementById('mainSVG').setAttribute("height", height);
 update(root);
 
 d3.select(self.frameElement).style("height", "800px");
-
+console.log(height)
 function update(source) {
 	
 	// This function will find how deep the tree is at a given point // 
-	var duration = d3.event && d3.event.altKey ? 5000 : 500;
+	var duration = d3.event && d3.event.altKey ? 5000 : height;
 	// compute the new height
 	var levelWidth = [1];
 	var childCount = function(level, n) {
